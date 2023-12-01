@@ -20,8 +20,7 @@ func part1() int {
 
 		s := string(c)
 		x := firstDigit(s, false)
-
-		s = Reverse(s)
+		Reverse(&s)
 		y := firstDigit(s, true)
 		sum += (x * 10) + y
 
@@ -39,7 +38,7 @@ func part2() int {
 
 	ar := strings.Split(string(content), "\n")
 	for _, c := range ar {
-		digits := [10]string{
+		digits := []string{
 			"zero",
 			"one",
 			"two",
@@ -58,7 +57,7 @@ func part2() int {
 		}
 		x := firstDigit(s, false)
 
-		s = Reverse(s)
+		Reverse(&s)
 		y := firstDigit(s, true)
 		sum += (x * 10) + y
 
@@ -81,10 +80,11 @@ func firstDigit(s string, reverse bool) int {
 	return 0
 }
 
-func Reverse(s string) (result string) {
-	for _, v := range s {
+func Reverse(s *string) (result string) {
+	for _, v := range *s {
 		result = string(v) + result
 	}
+	*s = result
 	return
 }
 
