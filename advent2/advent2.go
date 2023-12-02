@@ -8,6 +8,7 @@ import (
 )
 
 func part1() {
+
 	content, err := ioutil.ReadFile("input.txt") // the file is inside the local directory
 	if err != nil {
 		fmt.Println("Err")
