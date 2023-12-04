@@ -38,7 +38,7 @@ func listOfNumbers(str string) []int {
 }
 
 func part2() {
-	content, err := os.ReadFile("input.txt") // the file is inside the local directory
+	content, err := os.ReadFile(os.Args[1])
 	if err != nil {
 		fmt.Println("Err")
 	}
@@ -54,10 +54,8 @@ func part2() {
 			continue
 		}
 		split := strings.Split(string(c), "|")
-		fmt.Println(split)
 		winString := split[0]
 		myNumbers := listOfNumbers(split[1])
-		fmt.Println(myNumbers)
 
 		for _, i := range myNumbers {
 
@@ -65,11 +63,9 @@ func part2() {
 				mini_sum++
 			}
 		}
-		fmt.Println(mini_sum)
 		sum += mini_sum
 		scores = append(scores, mini_sum)
 		mini_sum = 0
-		fmt.Println(sum)
 
 	}
 
@@ -81,21 +77,11 @@ func part2() {
 		n := i + e + 1
 		m := i + 1
 		for i2 := m; i2 < n; i2++ {
-			// if !(i+e+1 > i2 && i2 >= (1+i)) {
-			// 	continue
-			// }
-
 			amounts[i2] = amounts[i2] + (amounts[i])
-			fmt.Println(i2, i)
-			fmt.Println(amounts)
 		}
 	}
 	sum = 0
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	for i, e := range amounts {
-		fmt.Println(e, scores[i], i)
+	for _, e := range amounts {
 		sum += e
 	}
 
@@ -118,10 +104,9 @@ func part1() {
 			break
 		}
 		split := strings.Split(string(c), "|")
-		fmt.Println(split)
 		winString := split[0]
+
 		myNumbers := listOfNumbers(split[1])
-		fmt.Println(myNumbers)
 
 		for _, i := range myNumbers {
 
@@ -133,10 +118,8 @@ func part1() {
 				}
 			}
 		}
-		fmt.Println(mini_sum)
 		sum += mini_sum
 		mini_sum = 0
-		fmt.Println(sum)
 
 	}
 
