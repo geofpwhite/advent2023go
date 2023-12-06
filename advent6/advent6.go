@@ -14,10 +14,8 @@ func part1() {
 	for index, time := range times {
 		distanceToBeat := distances[index]
 		for i := 0; i < time; i++ {
-			curSpeed := 0
-			curSpeed += i
-			distanceCheck := 0
-			distanceCheck += (curSpeed * (time - i))
+			curSpeed := i
+			distanceCheck := (curSpeed * (time - i))
 			if distanceCheck > distanceToBeat {
 				multipliers[index]++
 			}
@@ -46,8 +44,7 @@ func part2() {
 	time, _ := strconv.Atoi(timeString)
 	distance, _ := strconv.Atoi(distanceString)
 	for i := 0; i < time; i++ {
-		curSpeed := 0
-		curSpeed += i
+		curSpeed := i
 		distanceCheck := (curSpeed * (time - i))
 		if distanceCheck > distance {
 			waysToBeat++
@@ -57,11 +54,11 @@ func part2() {
 	fmt.Println(waysToBeat)
 }
 
-func parse() ([]int, []int) {
+func parse() (times []int, distances []int) {
 	content, _ := os.ReadFile("input.txt")
 	strs := strings.Split(string(content), "\n")
-	times := []int{}
-	distances := []int{}
+	times = []int{}
+	distances = []int{}
 	for i, c := range strs {
 		str := c[strings.Index(c, ":")+1:]
 		str = strings.Trim(str, " ")
@@ -95,9 +92,7 @@ func parse() ([]int, []int) {
 			str = str + " "
 			w, _ := strconv.Atoi(str[:strings.Index(str, " ")])
 			distances = append(distances, x, y, z, w)
-
 		}
-
 	}
 	return times, distances
 }
