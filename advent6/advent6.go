@@ -48,8 +48,7 @@ func part2() {
 	for i := 0; i < time; i++ {
 		curSpeed := 0
 		curSpeed += i
-		distanceCheck := 0
-		distanceCheck += (curSpeed * (time - i))
+		distanceCheck := (curSpeed * (time - i))
 		if distanceCheck > distance {
 			waysToBeat++
 		}
