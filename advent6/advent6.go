@@ -15,15 +15,8 @@ func part1() {
 		distanceToBeat := distances[index]
 		for i := 0; i < time; i++ {
 			curSpeed := 0
-			// for j = 0; j < i; j++ {
-			// 	curSpeed++
-			//
-			// }
 			curSpeed += i
 			distanceCheck := 0
-			// for ; j < time; j++ {
-			// 	distanceCheck += curSpeed
-			// }
 			distanceCheck += (curSpeed * (time - i))
 			if distanceCheck > distanceToBeat {
 				multipliers[index]++
@@ -54,16 +47,8 @@ func part2() {
 	distance, _ := strconv.Atoi(distanceString)
 	for i := 0; i < time; i++ {
 		curSpeed := 0
-		// for j = 0; j < i; j++ {
-		// 	curSpeed++
-		//
-		// }
 		curSpeed += i
 		distanceCheck := 0
-		// for ; j < time; j++ {
-		// 	distanceCheck += curSpeed
-		// }
-
 		distanceCheck += (curSpeed * (time - i))
 		if distanceCheck > distance {
 			waysToBeat++
@@ -76,29 +61,23 @@ func part2() {
 func parse() ([]int, []int) {
 	content, _ := os.ReadFile("input.txt")
 	strs := strings.Split(string(content), "\n")
-	fmt.Println(strs)
 	times := []int{}
 	distances := []int{}
 	for i, c := range strs {
 		str := c[strings.Index(c, ":")+1:]
 		str = strings.Trim(str, " ")
-		fmt.Println(str)
 		if i == 0 {
 			x, _ := strconv.Atoi(str[:strings.Index(str, " ")])
 			str = str[strings.Index(str, " "):]
 			str = strings.Trim(str, " ")
-			fmt.Println(x)
 			y, _ := strconv.Atoi(str[:strings.Index(str, " ")])
 			str = str[strings.Index(str, " "):]
 			str = strings.Trim(str, " ")
-			fmt.Println(y)
 			z, _ := strconv.Atoi(str[:strings.Index(str, " ")])
 			str = str[strings.Index(str, " "):]
 			str = strings.Trim(str, " ")
-			fmt.Println(z)
 			str = str + " "
 			w, _ := strconv.Atoi(str[:strings.Index(str, " ")])
-			fmt.Println(w)
 			times = append(times, x, y, z, w)
 
 		} else {
@@ -108,18 +87,14 @@ func parse() ([]int, []int) {
 			x, _ := strconv.Atoi(str[:strings.Index(str, " ")])
 			str = str[strings.Index(str, " "):]
 			str = strings.Trim(str, " ")
-			fmt.Println(x)
 			y, _ := strconv.Atoi(str[:strings.Index(str, " ")])
 			str = str[strings.Index(str, " "):]
 			str = strings.Trim(str, " ")
-			fmt.Println(y)
 			z, _ := strconv.Atoi(str[:strings.Index(str, " ")])
 			str = str[strings.Index(str, " "):]
 			str = strings.Trim(str, " ")
-			fmt.Println(z)
 			str = str + " "
 			w, _ := strconv.Atoi(str[:strings.Index(str, " ")])
-			fmt.Println(w)
 			distances = append(distances, x, y, z, w)
 
 		}
@@ -129,6 +104,6 @@ func parse() ([]int, []int) {
 }
 
 func main() {
-	// part1()
+	part1()
 	part2()
 }
