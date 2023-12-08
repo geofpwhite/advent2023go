@@ -13,14 +13,19 @@ type node struct {
 	right string
 }
 
-//gcd,lcm,and findLCM were written by chatgpt because I didn't want to deal with the monotony/pain in the butt
-
-// gcd calculates the greatest common divisor using Euclid's algorithm.
-func gcd(a, b *big.Int) *big.Int {
-	for b.Sign() != 0 {
-		a, b = b, new(big.Int).Mod(a, b)
+// lcm = | a * b | / gcd(a,b)
+func _lcm(numbers []int) int {
+	x := 1
+	for _, num := range numbers {
+		a := x
+		b := num
+		//euclidean algorithm
+		for b != 0 {
+			a, b = b, a%b
+		}
+		x *= num / a
 	}
-	return a
+	return x
 }
 
 // lcm calculates the least common multiple using the formula: LCM(a, b) = |a * b| / GCD(a, b)
