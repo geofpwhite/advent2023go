@@ -23,13 +23,12 @@ func part1() {
 
 	scores := []int{}
 	for i, line := range lines {
-		fmt.Println(line)
 		scores = append(scores, valid(line, numbers[i]))
 	}
 
 	sum := 0
 
-	for i, score := range scores {
+	for _, score := range scores {
 		sum += score
 	}
 
@@ -38,7 +37,6 @@ func part1() {
 }
 
 func valid(str string, nums []int) int {
-	fmt.Println(str)
 
 	if strings.Contains(str, "?") {
 
@@ -118,7 +116,7 @@ func valid(str string, nums []int) int {
 }
 
 func parse() ([]string, [][]int) {
-	content, _ := os.ReadFile("test.txt")
+	content, _ := os.ReadFile("input.txt")
 
 	lines := strings.Split(string(content), "\n")
 	numbers := [][]int{}
