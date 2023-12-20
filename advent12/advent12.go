@@ -7,17 +7,52 @@ import (
 	"strings"
 )
 
-// func part2() {
-//
-// 	lines,numbers := parse()
-//
-// 	for i := range lines {
-// 		startLine := lines[i] + "?"
-// 		endLine := "?" + lines[i]
-// 		middleLine := "?" + lines[i] + "?"
-// 	}
-// }
+func part2() {
 
+	lines, numbers := parse()
+
+	sum := 0
+	for i := range lines {
+
+		nn := []int{}
+		nn = append(nn, numbers[i]...)
+		nn = append(nn, numbers[i]...)
+
+		x := valid(lines[i], numbers[i])
+		// y := valid(lines[i]+".", numbers[i])
+		// w := valid("#"+lines[i], numbers[i])
+		v := valid(lines[i]+"#", numbers[i])
+		// u := valid("."+lines[i], numbers[i])
+		println()
+		// fmt.Println(x, y, w, v, u)
+		fmt.Println("line ", i)
+		if v == 0 {
+			z := valid(lines[i]+"?"+lines[i], nn)
+			// fmt.Println(startLine*endLine, z)
+			fmt.Println(z, " z")
+			if z == x*x {
+
+				fmt.Println(x * x * x * x * x)
+				sum += (x * x * x * x * x)
+				println()
+				continue
+			}
+		}
+		startLine := valid(lines[i]+"?", numbers[i])
+		endLine := valid("?"+lines[i], numbers[i])
+		middleLine := valid("?"+lines[i]+"?", numbers[i])
+
+		fmt.Println(startLine, middleLine, middleLine, middleLine, endLine)
+		fmt.Println(startLine * middleLine * middleLine * middleLine * endLine)
+		sum += (startLine * middleLine * middleLine * middleLine * endLine)
+		// middleLine2 := valid("#" + lines[i] + "#",numbers[i])
+		// middleLine3 := valid("." + lines[i] + "#",numbers[i])
+		// middleLine4 := valid("#" + lines[i] + ".",numbers[i])
+
+		println()
+	}
+	fmt.Println(sum)
+}
 func part1() {
 	lines, numbers := parse()
 
@@ -76,7 +111,7 @@ func valid(str string, nums []int) int {
 			if numIndex == len(nums) && len(line) > 0 {
 				return 0
 			}
-			if numIndex == len(nums) && len(line) <= 0 {
+			if numIndex == len(nums) && line == "" {
 				return 1
 			}
 
@@ -116,7 +151,9 @@ func valid(str string, nums []int) int {
 }
 
 func parse() ([]string, [][]int) {
-	content, _ := os.ReadFile("input.txt")
+	// content, _ := os.ReadFile("input.txt")
+	// content, _ := os.ReadFile("test.txt")
+	content, _ := os.ReadFile("oneline.txt")
 
 	lines := strings.Split(string(content), "\n")
 	numbers := [][]int{}
@@ -137,5 +174,5 @@ func parse() ([]string, [][]int) {
 
 func main() {
 	part1()
-	// part2()
+	part2()
 }
