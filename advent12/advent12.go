@@ -15,8 +15,12 @@ func part2() {
 	for i := range lines {
 
 		nn := []int{}
-		nn = append(nn, numbers[i]...)
-		nn = append(nn, numbers[i]...)
+		for _, num := range numbers[i] {
+			nn = append(nn, num)
+		}
+		for _, num := range numbers[i] {
+			nn = append(nn, num)
+		}
 
 		x := valid(lines[i], numbers[i])
 		// y := valid(lines[i]+".", numbers[i])
@@ -152,8 +156,8 @@ func valid(str string, nums []int) int {
 
 func parse() ([]string, [][]int) {
 	// content, _ := os.ReadFile("input.txt")
-	// content, _ := os.ReadFile("test.txt")
-	content, _ := os.ReadFile("oneline.txt")
+	content, _ := os.ReadFile("test.txt")
+	// content, _ := os.ReadFile("oneline.txt")
 
 	lines := strings.Split(string(content), "\n")
 	numbers := [][]int{}
@@ -174,5 +178,5 @@ func parse() ([]string, [][]int) {
 
 func main() {
 	part1()
-	part2()
+	// part2()
 }
