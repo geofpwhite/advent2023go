@@ -203,13 +203,152 @@ func part1() {
 			workflows["R"].parts = append(workflows["R"].parts, parts[i])
 		}
 	}
-
 	sum := 0
 	for _, p := range workflows["A"].parts {
 		sum += p.x + p.m + p.a + p.s
 	}
 	println(sum)
 }
+
+type Range struct {
+	min int
+	max int
+}
+
+type bigrange struct {
+	stats map[string]Range
+	cur   string
+}
+
+func defaultBigRange() *bigrange {
+	return &bigrange{
+		stats: map[string]Range{
+			"x": {
+				min: 1,
+				max: 4000},
+			"m": {
+				min: 1,
+				max: 4000,
+			},
+			"a": {
+				min: 1,
+				max: 4000,
+			},
+			"s": {
+				min: 1,
+				max: 4000,
+			},
+		},
+		cur: "in",
+	}
+}
+
+func bigCopy(br bigrange) *bigrange {
+	return &bigrange{
+		stats: map[string]Range{
+
+			"x": *Copy(br.stats["x"]),
+			"m": *Copy(br.stats["m"]),
+			"a": *Copy(br.stats["a"]),
+			"s": *Copy(br.stats["s"]),
+		},
+	}
+}
+
+func Copy(r Range) *Range {
+	return &Range{
+		min: r.min,
+		max: r.max,
+	}
+}
+
+func allDone(brs *[]bigrange) bool {
+	for _, br := range *brs {
+		if br.cur != "A" && br.cur != "R" && br.cur != "" {
+			return false
+		}
+
+	}
+	return true
+}
+
+func sum(r bigrange, workflows map[string]*workflow, ruleNumber int) int {
+	s := 0
+begin:
+	if r.cur == "A" {
+		return (r.stats["x"].max - r.stats["x"].min + 1) * (r.stats["m"].max - r.stats["m"].min + 1) * (r.stats["a"].max - r.stats["a"].min + 1) * (r.stats["s"].max - r.stats["s"].min + 1)
+	}
+	if r.cur == "R" {
+		return 0
+	}
+	fmt.Println(workflows[r.cur].rules)
+	for _, rule := range workflows[r.cur].rules[ruleNumber:] {
+		eq := rule.equality
+		st := rule.stat
+		if rule.accept {
+			rule.destination = "A"
+		}
+		if rule.reject {
+			rule.destination = "R"
+		}
+
+		newbigrange1 := bigCopy(r)
+		newbigrange2 := bigCopy(r)
+		if eq == ">" {
+			if rule.num < r.stats[string(st)].max && rule.num >= r.stats[string(st)].min {
+				newbigrange1.stats[string(st)] = Range{min: rule.num + 1, max: newbigrange1.stats[string(st)].max}
+				newbigrange2.stats[string(st)] = Range{max: rule.num, min: newbigrange2.stats[string(st)].min}
+				newbigrange1.cur = rule.destination
+				newbigrange2.cur = r.cur
+				if ruleNumber >= len(workflows[r.cur].rules)-1 {
+					println(ruleNumber)
+				}
+				rn := ruleNumber + 1
+				s += sum(*newbigrange1, workflows, 0) + sum(*newbigrange2, workflows, rn)
+				return s
+			} else if rule.num < r.stats[string(st)].min {
+				ruleNumber = 0
+				r.cur = rule.destination
+				goto begin
+			}
+			ruleNumber++
+
+		} else if eq == "<" {
+			if rule.num <= r.stats[string(st)].max && rule.num > r.stats[string(st)].min {
+				newbigrange1.stats[string(st)] = Range{min: rule.num, max: newbigrange1.stats[string(st)].max}
+				newbigrange2.stats[string(st)] = Range{max: rule.num - 1, min: newbigrange2.stats[string(st)].min}
+				newbigrange2.cur = rule.destination
+				newbigrange1.cur = r.cur
+				rn := ruleNumber + 1
+				if ruleNumber == len(workflows[r.cur].rules)-1 {
+					println(ruleNumber)
+				}
+				s += sum(*newbigrange1, workflows, rn) + sum(*newbigrange2, workflows, 0)
+				return s
+			} else if rule.num > r.stats[string(st)].max {
+				r.cur = rule.destination
+				ruleNumber = 0
+				goto begin
+			}
+			ruleNumber++
+
+		} else {
+
+			r.cur = rule.destination
+			ruleNumber = 0
+			goto begin
+		}
+	}
+	return s
+
+}
+
+func part2() {
+	workflows, _ := parse()
+	s := sum(*defaultBigRange(), workflows, 0)
+	println(s)
+}
 func main() {
 	part1()
+	part2()
 }
