@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type part struct {
@@ -262,14 +263,121 @@ func Copy(r Range) *Range {
 	}
 }
 
-func allDone(brs *[]bigrange) bool {
-	for _, br := range *brs {
-		if br.cur != "A" && br.cur != "R" && br.cur != "" {
-			return false
-		}
-
+func sumDriver() {
+	workflows, _ := parse()
+	var r bigrange = *defaultBigRange()
+	ruleNumber := 0
+	wg := &sync.WaitGroup{}
+	resultChan := make(chan int)
+	wg.Add(1)
+	s := 0
+	go sumRecursively(r, workflows, ruleNumber, wg, resultChan)
+	for value := range resultChan {
+		s += value
 	}
-	return true
+	wg.Wait()
+	println(s)
+}
+
+func sumRecursively(r bigrange, workflows map[string]*workflow, ruleNumber int, wg *sync.WaitGroup, resultChan chan int) {
+	defer wg.Done()
+	defer close(resultChan)
+	wg2 := &sync.WaitGroup{}
+	if r.cur == "A" {
+		resultChan <- (r.stats["x"].max - r.stats["x"].min + 1) * (r.stats["m"].max - r.stats["m"].min + 1) * (r.stats["a"].max - r.stats["a"].min + 1) * (r.stats["s"].max - r.stats["s"].min + 1)
+		return
+	}
+	if r.cur == "R" {
+		resultChan <- 0
+		return
+	}
+	rule := workflows[r.cur].rules[ruleNumber]
+	eq := rule.equality
+	st := rule.stat
+	if rule.accept {
+		rule.destination = "A"
+	}
+	if rule.reject {
+		rule.destination = "R"
+	}
+	newbigrange1 := bigCopy(r)
+	newbigrange2 := bigCopy(r)
+	if eq == ">" {
+		if rule.num < r.stats[string(st)].max && rule.num >= r.stats[string(st)].min {
+			newbigrange1.stats[string(st)] = Range{min: rule.num + 1, max: newbigrange1.stats[string(st)].max}
+			newbigrange2.stats[string(st)] = Range{max: rule.num, min: newbigrange2.stats[string(st)].min}
+			newbigrange1.cur = rule.destination
+			newbigrange2.cur = r.cur
+			rn := ruleNumber + 1
+			wg2.Add(2)
+			newChan1 := make(chan int)
+			newChan2 := make(chan int)
+			go sumRecursively(*newbigrange1, workflows, 0, wg2, newChan1)
+			go sumRecursively(*newbigrange2, workflows, rn, wg2, newChan2)
+			for value := range newChan1 {
+				resultChan <- value
+			}
+			for value := range newChan2 {
+				resultChan <- value
+			}
+			wg2.Wait()
+			return
+		} else if rule.num < r.stats[string(st)].min {
+			ruleNumber = 0
+			r.cur = rule.destination
+			wg2.Add(1)
+			newChan := make(chan int)
+			go sumRecursively(r, workflows, ruleNumber, wg2, newChan)
+			for value := range newChan {
+				resultChan <- value
+			}
+			wg2.Wait()
+			return
+		}
+	} else if eq == "<" {
+		if rule.num <= r.stats[string(st)].max && rule.num > r.stats[string(st)].min {
+			newbigrange1.stats[string(st)] = Range{min: rule.num, max: newbigrange1.stats[string(st)].max}
+			newbigrange2.stats[string(st)] = Range{max: rule.num - 1, min: newbigrange2.stats[string(st)].min}
+			newbigrange2.cur = rule.destination
+			newbigrange1.cur = r.cur
+			rn := ruleNumber + 1
+			wg2.Add(2)
+			newChan1 := make(chan int)
+			newChan2 := make(chan int)
+			go sumRecursively(*newbigrange1, workflows, rn, wg2, newChan1)
+			go sumRecursively(*newbigrange2, workflows, 0, wg2, newChan2)
+			for value := range newChan1 {
+				resultChan <- value
+			}
+			for value := range newChan2 {
+				resultChan <- value
+			}
+			wg2.Wait()
+			return
+		} else if rule.num > r.stats[string(st)].max {
+			r.cur = rule.destination
+			ruleNumber = 0
+			wg2.Add(1)
+			newChan := make(chan int)
+			go sumRecursively(r, workflows, ruleNumber, wg2, newChan)
+			for value := range newChan {
+				resultChan <- value
+			}
+			wg2.Wait()
+			return
+		}
+	} else {
+		r.cur = rule.destination
+		ruleNumber = 0
+		newChan := make(chan int)
+		wg2.Add(1)
+		go sumRecursively(r, workflows, ruleNumber, wg2, newChan)
+		for value := range newChan {
+			resultChan <- value
+		}
+		wg2.Wait()
+		return
+	}
 }
 
 func sum(r bigrange, workflows map[string]*workflow, ruleNumber int) int {
@@ -348,7 +456,11 @@ func part2() {
 	s := sum(*defaultBigRange(), workflows, 0)
 	println(s)
 }
+func part2good() {
+	sumDriver()
+}
 func main() {
 	part1()
 	part2()
+	part2good()
 }
