@@ -23,9 +23,10 @@ const (
 )
 
 var (
-	highs int   = 0
-	lows  int   = 0
-	Nodes nodes = nodes{
+	highs  int   = 0
+	lows   int   = 0
+	Cycles []int = make([]int, 4)
+	Nodes  nodes = nodes{
 		nodes: map[string]*node{},
 	}
 )
@@ -119,6 +120,16 @@ func (c *conj) receive(p pulse, input *node, parent *node) {
 	c.visited = true
 	c.inputMap[input.label] = p
 	// fmt.Println(c.inputMap)
+	if parent.label == "zh" {
+		i := 0
+		for _, value := range c.inputMap {
+			if value.level == HIGH && Cycles[i] == 0 {
+				Cycles[i] = ind
+			}
+			i++
+		}
+	}
+
 }
 func (c *conj) allHIGH() bool {
 	for _, value := range c.inputMap {
@@ -275,9 +286,11 @@ func findGCD(numbers []int) *big.Int {
 
 	return result
 }
+
+var ind = 0
+
 func part2() {
 	parse()
-	Nodes.nodes["output"] = &node{module: &flipflop{}}
 	Nodes.nodes["rx"] = &node{module: &flipflop{}}
 	var i int
 	/* for i = 0; Nodes.nodes["rx"].module.(*flipflop).shouldSend <= 0; i++ {
@@ -290,17 +303,19 @@ func part2() {
 		cycles[key] = 0
 	}
 
-	for i = 0; !Nodes.nodes["zh"].module.(*conj).allHIGH(); i++ {
+	for i = 0; i > -1; i++ {
+		ind++
 		Nodes.nodes["mk"].module.(*conj).visited = false
 		Nodes.nodes["broadcaster"].receive(pulse{level: LOW}, Nodes.nodes["broadcaster"])
 
-		for key, val := range Nodes.nodes["zh"].module.(*conj).inputMap {
+		/* for key, val := range Nodes.nodes["zh"].module.(*conj).inputMap {
 			if val.level == HIGH && cycles[key] == 0 {
 				cycles[key] = i
 			}
 		}
+		*/
 		stay := false
-		for _, val := range cycles {
+		for _, val := range Cycles {
 			if val == 0 {
 				stay = true
 			}
@@ -310,20 +325,14 @@ func part2() {
 		}
 
 	}
-	cyc := make([]int, len(cycles))
-	i = 0
-	for _, value := range cycles {
-		cyc[i] = value
-		i++
-	}
 
-	x := findLCM(cyc)
+	x := findLCM(Cycles)
 	fmt.Println(x)
 
 }
 
 func main() {
-	part1()
+	// part1()
 	part2()
 	// newgraph()
 
